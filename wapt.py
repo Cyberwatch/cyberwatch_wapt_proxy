@@ -105,7 +105,7 @@ def is_approximate_match(str1, str2, threshold=80):
 def find_software(data, soft_name,s):
     for software in data['result']:
         if software.get('name') in soft_name or software.get('package') in soft_name:
-            logging.info("Package found on machine")
+            logger.info("Package found on machine")
             return software
 
     response = s.get(f'{wapt_url}/api/v3/packages')
@@ -116,16 +116,16 @@ def find_software(data, soft_name,s):
         for software_data in response_data["result"]:
             prefixed = prefix + "-" + soft
             if  soft == software_data["name"].lower() or prefixed == software_data["package"].lower():
-                logging.info("Package found in repo but not pushed yet on machine")
+                logger.info("Package found in repo but not pushed yet on machine")
                 return software_data
             if  is_approximate_match(soft.lower(), software_data["name"].lower()) or is_approximate_match(prefixed.lower(), software_data["package"].lower()):
-                logging.info("Package found in repo with fuzz but not pushed yet on machine")
+                logger.info("Package found in repo with fuzz but not pushed yet on machine")
                 return software_data
         else:
-            logging.info("Package not found, trying dictionnary method")
+            logger.info("Package not found, trying dictionnary method")
             dict = find_software_dict(dict_name_soft, soft_name)
             if dict:
-                logging.info("Package found with dictionnary method")
+                logger.info("Package found with dictionnary method")
                 filtered_data = [entry for entry in response_data["result"] if entry.get("package") == dict]
                 return filtered_data[0].lower().strip()
 
@@ -148,7 +148,7 @@ def install_package():
         #################################################
         s = get_session_wapt(CONF.get('cyberwatch', 'wapt_user'),password)
     except requests.exceptions.RequestException as e:
-        logging.exception("Request failed: %s", e)
+        logger.exception("Request failed: %s", e)
 
     uuid = search_uuid(hostname,s)
 
@@ -166,13 +166,13 @@ def install_package():
     # Send GET request
     response = s.get(f'{wapt_url}/api/v3/host_data?uuid={uuid}&field=installed_packages')
 
-    logging.info(soft_name)
+    logger.info(soft_name)
 
     result = find_software(response.json(), soft_name,s)
 
     package = result['package']
 
-    logging.info(package)
+    logger.info(package)
 
     if package is not None :
         actions = []
