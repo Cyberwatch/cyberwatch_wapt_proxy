@@ -15,6 +15,11 @@
 Note : il faut que le serveur avec `wapt.py` soit équipé d'un agent WAPT afin d'avoir les dépendances nécessaires pour l'intégration.
 Si nécessaire, l'agent WAPT est disponible à cette adresse : [https://wapt.tranquil.it/wapt/releases/latest/](https://wapt.tranquil.it/wapt/releases/latest/)
 
+Exécutez ensuite la commande suivante sur le serveur pour installer la dépendance `fuzzywuzzy` :
+`sudo /opt/wapt/bin/python -m pip install fuzzywuzzy`
+
+Cette bibliothèque est nécessaire pour que l’intégration WAPT/Cyberwatch fonctionne correctement.
+
 5. **Configuration :** Modifiez le fichier `integration.conf` en insérant les valeurs appropriées et les clés d'API Cyberwatch.
     Depuis la version 2.5, la plupart des URL d’API est protégée par des certificats clients SSL (ssl_pem_client_location et ssl_cert_client_location dans integarations.conf). Vous pouvez les trouver dans `/opt/wapt/conf`.
 
