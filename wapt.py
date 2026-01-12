@@ -173,7 +173,6 @@ def install_package():
     if not result:
         logger.info("No packet match found for %s", ' '.join(soft_name))
         return "No packet match was found for %s" % ' '.join(soft_name), 404
-
     
     package = result['package']
 
