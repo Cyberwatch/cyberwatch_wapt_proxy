@@ -254,4 +254,5 @@ def install_package():
                 os.unlink(tmp_fn)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000,
+            ssl_context=(CONF.get('cyberwatch', 'tls_cert'), CONF.get('cyberwatch', 'tls_key')))
