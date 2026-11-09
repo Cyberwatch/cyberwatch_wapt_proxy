@@ -27,6 +27,13 @@ Cette bibliothèque est nécessaire pour que l’intégration WAPT/Cyberwatch fo
 
     Renseignez `api_token` avec un secret aléatoire, par exemple `openssl rand -hex 32`.
 
+    Générez le certificat TLS du proxy pour l'adresse de l'URL de l'étape 7 :
+
+        openssl req -x509 -newkey rsa:3072 -nodes -days 825 -keyout proxy.key -out proxy.crt -subj "/CN=cyberwatch-wapt-proxy" -addext "subjectAltName=IP:<IP SERVEUR CBW>"
+        chmod 600 proxy.key
+
+    Si l'URL utilise un nom, écrivez `DNS:<nom>` à la place de `IP:<IP SERVEUR CBW>`. Renseignez ensuite les chemins de `proxy.crt` et `proxy.key` dans `tls_cert` et `tls_key`.
+
 6. **Test :** Pour tester le fonctionnement, lancez le proxy en utilisant la commande ` sudo /opt/wapt/waptpython.sh wapt.py`.
 
 ### Configuration de Cyberwatch
@@ -34,7 +41,7 @@ Cette bibliothèque est nécessaire pour que l’intégration WAPT/Cyberwatch fo
 7. **Intégration à Cyberwatch :** dans la section "Administration/Integrations" de Cyberwatch, ajoutez une intégration avec la configuration suivante :
 
     - Emplacement : Onglet "Gestion de Correctifs"
-    - URL de la requête : `http://[IP SERVEUR CBW]:5000/install_package`
+    - URL de la requête : `https://[IP SERVEUR CBW]:5000/install_package`
     - En-têtes : `{"content-type":"application/json", "Authorization":"Bearer <api_token>"}`
     - Corps de la requête :
 
@@ -44,7 +51,10 @@ Cette bibliothèque est nécessaire pour que l’intégration WAPT/Cyberwatch fo
             }
 
     - Méthode : POST
-    - Utiliser un certificat auto-signé pour la requête : Oui
+    - Utiliser un certificat auto-signé pour la requête : Non
+    - Certificat CA : le contenu de `proxy.crt`
+
+    Si votre version de Cyberwatch n'a pas le champ « Certificat CA », cochez « Utiliser un certificat auto-signé pour la requête » : la connexion reste chiffrée, mais le certificat du proxy n'est pas vérifié.
 
 8. **Test de l'intégration :** Tentez d'abord une exécution de l'intégration depuis un actif. Assurez-vous que le code de retour HTTP est bien dans la plage 20x. Un code 401 signale un jeton incorrect. Pour vérifier les logs du proxy, consultez le terminal. Ensuite, vérifiez dans la console WAPT si une mise à jour a bien été effectuée sur l'actif.
 
