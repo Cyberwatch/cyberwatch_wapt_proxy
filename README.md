@@ -25,6 +25,8 @@ Cette bibliothèque est nécessaire pour que l’intégration WAPT/Cyberwatch fo
 
     ![Configuration WAPT locale - Chemin du certificat personnel](wapt_console_preferences.png)
 
+    Renseignez `api_token` avec un secret aléatoire, par exemple `openssl rand -hex 32`.
+
 6. **Test :** Pour tester le fonctionnement, lancez le proxy en utilisant la commande ` sudo /opt/wapt/waptpython.sh wapt.py`.
 
 ### Configuration de Cyberwatch
@@ -33,7 +35,7 @@ Cette bibliothèque est nécessaire pour que l’intégration WAPT/Cyberwatch fo
 
     - Emplacement : Onglet "Gestion de Correctifs"
     - URL de la requête : `http://[IP SERVEUR CBW]:5000/install_package`
-    - En-têtes : `{"content-type":"application/json"}`
+    - En-têtes : `{"content-type":"application/json", "Authorization":"Bearer <api_token>"}`
     - Corps de la requête :
 
             {
@@ -44,7 +46,7 @@ Cette bibliothèque est nécessaire pour que l’intégration WAPT/Cyberwatch fo
     - Méthode : POST
     - Utiliser un certificat auto-signé pour la requête : Oui
 
-8. **Test de l'intégration :** Tentez d'abord une exécution de l'intégration depuis un actif. Assurez-vous que le code de retour HTTP est bien dans la plage 20x. Pour vérifier les logs du proxy, consultez le terminal. Ensuite, vérifiez dans la console WAPT si une mise à jour a bien été effectuée sur l'actif.
+8. **Test de l'intégration :** Tentez d'abord une exécution de l'intégration depuis un actif. Assurez-vous que le code de retour HTTP est bien dans la plage 20x. Un code 401 signale un jeton incorrect. Pour vérifier les logs du proxy, consultez le terminal. Ensuite, vérifiez dans la console WAPT si une mise à jour a bien été effectuée sur l'actif.
 
 ### Finalisation
 
