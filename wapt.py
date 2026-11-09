@@ -2,6 +2,7 @@
 
 import os
 import json
+import hmac
 import logging
 from logging.handlers import RotatingFileHandler
 import tempfile
@@ -51,6 +52,10 @@ prefix = CONF.get('cyberwatch', 'prefix')
 url = CONF.get('cyberwatch', 'url')
 access_key = CONF.get('cyberwatch', 'access_key')
 secret_key = CONF.get('cyberwatch', 'secret_key')
+
+api_token = CONF.get('cyberwatch', 'api_token', fallback='')
+if not api_token:
+    sys.exit('api_token is missing in integration.conf')
 
 dict_name_soft = json.loads(CONF.get('cyberwatch', 'software_dict'))
 
@@ -127,6 +132,13 @@ def find_software(data, soft_name,s):
                 logger.info("Package found with dictionnary method")
                 filtered_data = [entry for entry in response_data["result"] if entry.get("package") == dict]
                 return filtered_data[0].lower().strip()
+
+@app.before_request
+def check_api_token():
+    # compare_digest lève TypeError sur une chaîne non ASCII : on compare des octets.
+    if not hmac.compare_digest(request.headers.get('Authorization', '').encode(), f'Bearer {api_token}'.encode()):
+        logger.warning("Rejected call from %s: missing or invalid token", request.remote_addr)
+        return "Unauthorized", 401
 
 # Install package with WAPT
 @app.route('/install_package', methods=['POST'])
